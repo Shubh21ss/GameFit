@@ -31,12 +31,13 @@ if getattr(sys, 'frozen', False):
 RAWG_API_KEY = "c75f5df597d54311b52df3ad15bd4a7d"
 # Handle PyInstaller bundled data path
 if getattr(sys, 'frozen', False):
-    # Running as bundled exe
-    DATASET = os.path.join(sys._MEIPASS, "data", "custom_games.csv")
+    # Running as bundled exe - include seed CSV if bundled
+    DATASET = os.path.join(sys._MEIPASS, "docs", "seed", "custom_games.csv")
     DB_PATH = os.path.join(sys._MEIPASS, "data", "gamefit.db")
 else:
-    DATASET = "data/custom_games.csv"
-    DB_PATH = "data/gamefit.db"
+    # Use canonical DB; keep seed CSV in docs/seed for edits
+    DATASET = os.path.join("docs", "seed", "custom_games.csv")
+    DB_PATH = os.path.join("data", "gamefit.db")
 
 # ========== PERFORMANCE OPTIMIZATION: Caching & DB Pooling =========
 # Global database connection (pooling) - reuse instead of creating new ones
