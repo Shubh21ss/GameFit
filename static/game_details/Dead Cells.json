@@ -1,0 +1,21 @@
+{
+  "platforms": [
+    "PC",
+    "Xbox One",
+    "PlayStation 4",
+    "Nintendo Switch",
+    "iOS",
+    "macOS",
+    "Linux"
+  ],
+  "stores": [
+    "Steam",
+    "PlayStation Store",
+    "Xbox Store",
+    "App Store",
+    "GOG",
+    "Nintendo Store",
+    "itch.io",
+    "Epic Games"
+  ]
+}

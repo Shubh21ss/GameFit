@@ -1,0 +1,364 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GameFit — Game Compatibility Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <div class="logo-icon"></div>
+          <div class="logo-text">GameFit</div>
+        </div>
+        <div class="nav-actions">
+          <button id="start-btn" class="btn btn-primary"><i class="fas fa-play"></i>&nbsp; Start System Scan</button>
+        </div>
+      </div>
+    </nav>
+    
+    <main class="container">
+      <section class="hero">
+        <h1>Game Compatibility Checker</h1>
+        <p class="lead">Instantly check if your PC can run any game</p>
+      </section>
+
+      <div id="loader" class="loader hidden"></div>
+
+      <div id="logBox" class="log-box hidden">
+        <div id="logMessages"></div>
+      </div>
+
+      <section id="specs" class="section hidden">
+        <h2>Your System Specifications</h2>
+        <div id="spec-grid" class="spec-grid"></div>
+      </section>
+
+      <section id="games" class="section hidden">
+        <h2>Compatible Games</h2>
+        <div class="search-filter">
+          <input type="text" id="search-input" placeholder="Search games by name...">
+          <select id="ram-filter">
+            <option value="">All RAM</option>
+            <option value="4">Min RAM: 4GB+</option>
+            <option value="8">Min RAM: 8GB+</option>
+            <option value="16">Min RAM: 16GB+</option>
+          </select>
+          <select id="vram-filter">
+            <option value="">All VRAM</option>
+            <option value="2">Min VRAM: 2GB+</option>
+            <option value="4">Min VRAM: 4GB+</option>
+            <option value="8">Min VRAM: 8GB+</option>
+          </select>
+        </div>
+        <div id="games-grid" class="games-grid"></div>
+      </section>
+
+    </main>
+
+    <div id="see-all-btn-container" class="see-all-container hidden">
+      <button id="see-all-btn" class="btn btn-secondary">Show All Games</button>
+    </div>
+
+    <!-- Game Details Modal -->
+    <div id="gameModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modal-content">
+          <img id="modal-image" src="" alt="Game Image" />
+          <h2 id="modal-title"></h2>
+          <div class="requirements">
+            <h3>System Requirements</h3>
+            <div class="req-section">
+              <h4>Minimum</h4>
+              <p id="modal-os-min"></p>
+              <p id="modal-cpu-min"></p>
+              <p id="modal-ram-min"></p>
+              <p id="modal-gpu-min"></p>
+              <p id="modal-vram-min"></p>
+              <p id="modal-storage-min"></p>
+            </div>
+            <div class="req-section">
+              <h4>Recommended</h4>
+              <p id="modal-os-rec"></p>
+              <p id="modal-cpu-rec"></p>
+              <p id="modal-ram-rec"></p>
+              <p id="modal-gpu-rec"></p>
+              <p id="modal-vram-rec"></p>
+              <p id="modal-storage-rec"></p>
+            </div>
+          </div>
+          <div class="availability">
+            <h3>Available On</h3>
+            <div id="modal-platforms"></div>
+            <h3>Download From</h3>
+            <div id="modal-stores"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">Made with  — GameFit</footer>
+
+    <script>
+      const startBtn = document.getElementById('start-btn');
+      const loader = document.getElementById('loader');
+      const specsSection = document.getElementById('specs');
+      const gamesSection = document.getElementById('games');
+      const specGrid = document.getElementById('spec-grid');
+      const gamesGrid = document.getElementById('games-grid');
+      const logBox = document.getElementById('logBox');
+      const logMessages = document.getElementById('logMessages');
+      const gameModal = document.getElementById('gameModal');
+      const closeBtn = document.getElementsByClassName('close')[0];
+
+      let gameData = []; // Store game data globally
+
+      function addLogMessage(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        logMessages.innerHTML += `[${timestamp}] ${message}<br>`;
+        logMessages.scrollTop = logMessages.scrollHeight;
+      }
+
+      // Modal close functionality
+      closeBtn.onclick = function() {
+        gameModal.classList.remove('show');
+      }
+      window.onclick = function(event) {
+        if (event.target == gameModal) {
+          gameModal.classList.remove('show');
+        }
+      }
+
+      async function showGameDetails(game) {
+        // If game details aren't loaded yet, fetch them
+        if (!game.image && game.platforms.length === 0 && game.stores.length === 0) {
+          addLogMessage(`Loading details for ${game.name}...`);
+          try {
+            const encodedName = encodeURIComponent(game.name);
+            const res = await fetch(`/api/game/${encodedName}`);
+            const details = await res.json();
+            // Update the game object with fetched details
+            game.image = details.image;
+            game.platforms = details.platforms;
+            game.stores = details.stores;
+            addLogMessage(`Details loaded for ${game.name}`);
+          } catch (e) {
+            addLogMessage(`Failed to load details for ${game.name}`);
+            console.error('Error loading game details:', e);
+          }
+        }
+
+        document.getElementById('modal-image').src = game.image || '/static/placeholder.svg';
+        document.getElementById('modal-title').textContent = game.name;
+        document.getElementById('modal-os-min').textContent = `OS: ${game.os_min}`;
+        document.getElementById('modal-cpu-min').textContent = `CPU: ${game.cpu_min}`;
+        document.getElementById('modal-ram-min').textContent = `RAM: ${game.ram_min}`;
+        document.getElementById('modal-gpu-min').textContent = `GPU: ${game.gpu_min}`;
+        document.getElementById('modal-vram-min').textContent = `VRAM: ${game.vram_min || 'N/A'}`;
+        document.getElementById('modal-storage-min').textContent = `Storage: ${game.storage_min}`;
+        document.getElementById('modal-os-rec').textContent = `OS: ${game.os_rec || 'N/A'}`;
+        document.getElementById('modal-cpu-rec').textContent = `CPU: ${game.cpu_rec}`;
+        document.getElementById('modal-ram-rec').textContent = `RAM: ${game.ram_rec}`;
+        document.getElementById('modal-gpu-rec').textContent = `GPU: ${game.gpu_rec}`;
+        document.getElementById('modal-vram-rec').textContent = `VRAM: ${game.vram_rec || 'N/A'}`;
+        document.getElementById('modal-storage-rec').textContent = `Storage: ${game.storage_rec}`;
+        
+        // Create platform links
+        const platformsDiv = document.getElementById('modal-platforms');
+        if (game.platforms.length > 0) {
+          const platformLinks = game.platforms.map(platform => {
+            const url = getPlatformUrl(platform);
+            return url ? `<a href="${url}" target="_blank" class="platform-link">${platform}</a>` : platform;
+          });
+          platformsDiv.innerHTML = platformLinks.join(', ');
+        } else {
+          platformsDiv.innerHTML = 'Not available';
+        }
+        
+        // Create store links
+        const storesDiv = document.getElementById('modal-stores');
+        if (game.stores.length > 0) {
+          const storeLinks = game.stores.map(store => {
+            const url = getStoreUrl(store, game.name);
+            return url ? `<a href="${url}" target="_blank" class="store-link">${store}</a>` : store;
+          });
+          storesDiv.innerHTML = storeLinks.join(', ');
+        } else {
+          storesDiv.innerHTML = 'Not available';
+        }
+        
+        gameModal.classList.add('show');
+      }
+
+      function displayGames(games) {
+        gamesGrid.innerHTML = '';
+        games.forEach(g => {
+          const card = document.createElement('div');
+          card.className = 'game-card';
+          card.innerHTML = `\
+            <img src="${g.image || '/static/placeholder.svg'}" alt="${g.name}" />\
+            <h3>${g.name}</h3>\
+            <p>Min RAM: ${g.ram_min}  Min VRAM: ${g.gpu_min || g.vram_min || 'N/A'}</p>`;
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => showGameDetails(g));
+          gamesGrid.appendChild(card);
+        });
+      }
+
+      // Search and Filter functionality
+      const searchInput = document.getElementById('search-input');
+      const ramFilter = document.getElementById('ram-filter');
+      const vramFilter = document.getElementById('vram-filter');
+
+      function filterGames() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const ramMin = parseFloat(ramFilter.value) || 0;
+        const vramMin = parseFloat(vramFilter.value) || 0;
+        const filtered = gameData.filter(g => {
+          const matchesSearch = g.name.toLowerCase().includes(searchTerm);
+          const matchesRam = parseFloat(g.ram_min) >= ramMin;
+          const matchesVram = parseFloat(g.vram_min || 0) >= vramMin;
+          return matchesSearch && matchesRam && matchesVram;
+        });
+        displayGames(filtered);
+        // Hide see-all button when filtering
+        document.getElementById('see-all-btn-container').classList.add('hidden');
+      }
+
+      searchInput.addEventListener('input', filterGames);
+      ramFilter.addEventListener('change', filterGames);
+      vramFilter.addEventListener('change', filterGames);
+
+      function getPlatformUrl(platform) {
+        const platformUrls = {
+          'PC': 'https://store.steampowered.com/',
+          'PlayStation 4': 'https://store.playstation.com/',
+          'PlayStation 5': 'https://store.playstation.com/',
+          'Xbox One': 'https://www.microsoft.com/store/games/xbox',
+          'Xbox Series S/X': 'https://www.microsoft.com/store/games/xbox',
+          'Nintendo Switch': 'https://www.nintendo.com/store/',
+          'macOS': 'https://store.steampowered.com/',
+          'Linux': 'https://store.steampowered.com/',
+          'Android': 'https://play.google.com/store/games',
+          'iOS': 'https://apps.apple.com/us/app/itunes-store/id461504587'
+        };
+        return platformUrls[platform] || null;
+      }
+
+      function getStoreUrl(store, gameName) {
+        const encodedGameName = encodeURIComponent(gameName);
+        const storeUrls = {
+          'Steam': `https://store.steampowered.com/search/?term=${encodedGameName}`,
+          'Epic Games': `https://store.epicgames.com/browse?q=${encodedGameName}`,
+          'GOG': `https://www.gog.com/games?query=${encodedGameName}`,
+          'Microsoft Store': `https://www.microsoft.com/store/search/games?q=${encodedGameName}`,
+          'PlayStation Store': `https://store.playstation.com/search/${encodedGameName}`,
+          'Nintendo eShop': `https://www.nintendo.com/search/#category=all&query=${encodedGameName}`,
+          'Google Play': `https://play.google.com/store/search?q=${encodedGameName}`,
+          'App Store': `https://apps.apple.com/us/search?term=${encodedGameName}`,
+          'Itch.io': `https://itch.io/search?q=${encodedGameName}`,
+          'Humble Store': `https://www.humblebundle.com/store/search?search=${encodedGameName}`
+        };
+        return storeUrls[store] || null;
+      }
+
+      startBtn.addEventListener('click', async () => {
+        startBtn.disabled = true;
+        loader.classList.remove('hidden');
+        logBox.classList.remove('hidden');
+        specsSection.classList.add('hidden');
+        gamesSection.classList.add('hidden');
+        // Ensure button is hidden at start of scan
+        document.getElementById('see-all-btn-container').classList.add('hidden');
+        // Reset button state
+        showingAllGames = false;
+        logMessages.innerHTML = '';
+        
+        try {
+          addLogMessage('Initializing system scan...');
+          addLogMessage('Fetching system specifications...');
+          const res = await fetch('/api/games');
+          addLogMessage('Processing system data...');
+          const data = await res.json();
+          addLogMessage('System specifications retrieved successfully.');
+          
+          specGrid.innerHTML = '';
+          for (const [k, v] of Object.entries(data.system_info)) {
+            const el = document.createElement('div');
+            el.className = 'spec-card';
+            el.innerHTML = `<strong>${k}</strong><div>${v}</div>`;
+            specGrid.appendChild(el);
+          }
+          specsSection.classList.remove('hidden');
+          addLogMessage('Checking game compatibility...');
+
+          gamesGrid.innerHTML = '';
+          gameData = data.compatible_games; // Store the data
+          console.log('Compatible games found:', data.compatible_games.length);
+          if (data.compatible_games.length === 0) {
+            gamesGrid.innerHTML = '<p>No compatible games found.</p>';
+            addLogMessage('No compatible games found.');
+          } else {
+            addLogMessage(`Found ${data.compatible_games.length} compatible games.`);
+            // Show only first 4 games initially
+            displayGames(data.compatible_games.slice(0, 4));
+          }
+          gamesSection.classList.remove('hidden');
+          addLogMessage('Scan completed successfully.');
+          
+          // Show the "Show All Games" button after a brief delay to ensure everything is rendered
+          if (data.compatible_games.length > 4) {
+            console.log('Will show see all button after delay, games found:', data.compatible_games.length);
+            setTimeout(() => {
+              console.log('Showing see all button now');
+              const btnContainer = document.getElementById('see-all-btn-container');
+              btnContainer.classList.remove('hidden');
+              btnContainer.style.display = 'block';
+              addLogMessage('Click "Show All Games" to see all compatible games.');
+            }, 1000); // 1 second delay after scan completion
+          } else {
+            console.log('No need for button, 4 or fewer games found');
+          }
+        } catch (err) {
+          addLogMessage('Error during scan: ' + err.message);
+          alert('Error fetching system info. Check console for details.');
+          console.error(err);
+        } finally {
+          loader.classList.add('hidden');
+          logBox.classList.add('hidden');
+          startBtn.disabled = false;
+        }
+      });
+
+      // See All Compatible Games button functionality
+      const seeAllBtn = document.getElementById('see-all-btn');
+      let showingAllGames = false;
+
+      console.log('See all button element:', seeAllBtn);
+
+      seeAllBtn.addEventListener('click', () => {
+        console.log('See all button clicked, current state:', showingAllGames);
+        
+        if (!showingAllGames) {
+          // Show all games
+          displayGames(gameData);
+          // Change button text
+          seeAllBtn.textContent = 'Show Less Games';
+          showingAllGames = true;
+          addLogMessage(`All ${gameData.length} compatible games displayed.`);
+        } else {
+          // Show only first 4 games
+          displayGames(gameData.slice(0, 4));
+          // Change button text back
+          seeAllBtn.textContent = 'Show All Games';
+          showingAllGames = false;
+          addLogMessage('Showing top 4 compatible games.');
+        }
+      });
+    </script>
+  </body>
+</html>

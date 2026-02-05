@@ -1,0 +1,24 @@
+{
+  "platforms": [
+    "PC",
+    "Xbox One",
+    "PlayStation 4",
+    "Nintendo Switch",
+    "iOS",
+    "Android",
+    "Nintendo 3DS",
+    "macOS",
+    "Linux",
+    "Xbox 360",
+    "PlayStation 3",
+    "PS Vita",
+    "Wii U"
+  ],
+  "stores": [
+    "PlayStation Store",
+    "Xbox Store",
+    "App Store",
+    "Nintendo Store",
+    "Google Play"
+  ]
+}

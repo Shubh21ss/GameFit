@@ -1,0 +1,83 @@
+name,os_min,os_rec,cpu_min,cpu_rec,ram_min,ram_rec,gpu_min,gpu_rec,vram_min,vram_rec,storage_min,storage_rec,release_date
+Red Dead Redemption 2,Windows 10,Windows 11,Intel Core i5-2500K,Intel Core i7-4770K,8,12,NVIDIA GTX 770,NVIDIA GTX 1060,2,6,150,150,26-10-2018
+Cyberpunk 2077,Windows 10,Windows 11,Intel Core i5-3570K,Intel Core i7-4790,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,3,6,70,70,10-12-2020
+Elden Ring,Windows 10,Windows 11,Intel Core i5-8400,Intel Core i7-8700K,12,16,NVIDIA GTX 1060,NVIDIA GTX 1070,3,8,60,60,25-02-2022
+Stardew Valley,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 750,1,2,1,2,26-02-2016
+Minecraft,Windows 7,Windows 10,Intel i3-3210,Intel i5-4690,4,8,Intel HD 4000,NVIDIA GTX 750,1,2,1,4,18-11-2011
+The Witcher 3,Windows 7,Windows 10,Intel Core i7,Intel Core i7,8,16,NVIDIA GTX 770,NVIDIA GTX 1080,3,8,136,136,19-05-2015
+Baldur's Gate 3,Windows 10,Windows 11,Intel Core i7-4790,Intel Core i7-10700K,14,20,NVIDIA GTX 2060,NVIDIA RTX 3070,4,8,150,150,03-08-2023
+Starfield,Windows 10,Windows 11,Intel Core i7-7700K,Intel Core i9-12900K,16,32,NVIDIA GTX 1070,NVIDIA RTX 3090,8,12,125,125,06-09-2023
+Palworld,Windows 10,Windows 11,Intel Core i5-9600K,Intel Core i7-10700K,16,32,NVIDIA RTX 2070,NVIDIA RTX 3080,8,10,40,40,20-01-2024
+Dragon's Dogma 2,Windows 10,Windows 11,Intel Core i7-10700,Intel Core i7-12700K,16,32,NVIDIA RTX 2080,NVIDIA RTX 3090,10,12,150,150,22-03-2024
+Final Fantasy XIV,Windows 7,Windows 10,Intel Core i5-2500,Intel Core i7,8,16,NVIDIA GTX 750,NVIDIA GTX 1080,1,4,20,40,27-08-2013
+Counter-Strike 2,Windows 10,Windows 11,Intel Core 2 Duo E8400,Intel Core i5-4440,2,8,NVIDIA 8600 GT,NVIDIA GTX 1050,1,3,34,34,01-09-2023
+Fortnite,Windows 7,Windows 10,Intel Core i5-3570K,Intel Core i7-8700K,8,16,NVIDIA GTX 660,NVIDIA GTX 1070,2,8,250,250,25-07-2018
+The Sims 4,Windows Vista,Windows 11,Intel Core 2 Duo,Intel i5,4,8,Intel HD Graphics,NVIDIA GTX 750,1,2,50,50,02-09-2014
+ Grand Theft Auto V,Windows 8.1,Windows 10,Intel Core i5-3470,Intel Core i7-3770,8,16,NVIDIA GTX 660,NVIDIA GTX 1060,2,4,72,72,14-04-2015
+Call of Duty: Warzone,Windows 10,Windows 11,Intel Core i5-2500K,Intel Core i7-4770,8,16,NVIDIA GTX 670,NVIDIA GTX 1650,2,4,175,175,10-03-2020
+Apex Legends,Windows 7,Windows 10,Intel Core i3-6300,Intel i5-3570K,6,8,NVIDIA GTX 640,NVIDIA GTX 1060,1,4,56,56,04-02-2019
+League of Legends,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,16,16,27-10-2009
+Valorant,Windows 7,Windows 10,Intel Core 2 Duo E8400,Intel i3-4150,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,8,8,02-06-2020
+Overwatch 2,Windows 10,Windows 11,Intel Core i5-3570K,Intel Core i7-4770,8,16,NVIDIA GTX 660,NVIDIA GTX 1060,2,4,50,50,04-10-2022
+World of Warcraft,Windows 7,Windows 10,Intel Core i5-3450,Intel i7-4770,4,8,NVIDIA GTX 650,NVIDIA GTX 960,1,2,100,100,23-11-2004
+Diablo IV,Windows 10,Windows 11,Intel Core i5-9600K,Intel Core i7-10700K,16,32,NVIDIA RTX 2060,NVIDIA RTX 3070,4,8,100,100,06-06-2023
+Hogwarts Legacy,Windows 10,Windows 11,Intel Core i5-6600,Intel Core i7-8700,16,32,NVIDIA GTX 960,NVIDIA RTX 2060,4,8,85,85,10-02-2023
+Resident Evil 4,Windows 10,Windows 11,Intel Core i5-4460,Intel Core i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,26,26,24-03-2023
+Dead Space,Windows 10,Windows 11,Intel Core i5-6600K,Intel Core i7-8700K,16,32,NVIDIA GTX 1070,NVIDIA RTX 2060,4,8,50,50,27-01-2023
+Alan Wake 2,Windows 10,Windows 11,Intel Core i5-7600K,Intel Core i7-8700K,16,32,NVIDIA GTX 1070,NVIDIA RTX 3070,4,8,90,90,27-10-2023
+Marvel's Spider-Man 2,Windows 10,Windows 11,Intel Core i5-10600K,Intel Core i7-12700K,16,32,NVIDIA RTX 3070,NVIDIA RTX 4070,8,12,100,100,20-10-2023
+Assassin's Creed Valhalla,Windows 10,Windows 11,Intel Core i5-4460,Intel Core i7-8700K,8,16,NVIDIA GTX 960,NVIDIA RTX 2060,4,8,50,50,10-11-2020
+Far Cry 6,Windows 10,Windows 11,Intel Core i5-4460,Intel Core i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,4,8,60,60,07-10-2021
+Watch Dogs: Legion,Windows 10,Windows 11,Intel Core i5-4460,Intel Core i7-8700,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,4,6,50,50,29-10-2020
+Ghostwire: Tokyo,Windows 10,Windows 11,Intel Core i5-8400,Intel Core i7-8700,8,16,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,18,18,25-03-2022
+Back 4 Blood,Windows 10,Windows 11,Intel Core i5-6600,Intel Core i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,50,50,12-10-2021
+The Outer Worlds 2,Windows 10,Windows 11,Intel Core i5-6600,Intel Core i7-8700,16,32,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,80,80,07-07-2023
+Sifu,Windows 10,Windows 11,Intel Core i5-8400,Intel Core i7-8700,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,50,50,08-02-2022
+Chorus,Windows 10,Windows 11,Intel Core i5-6600,Intel Core i7-8700,16,32,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,50,50,03-12-2021
+Loop Hero,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,2,2,16-03-2021
+Spiritfarer,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,5,5,18-08-2020
+Hades,Windows 7,Windows 10,Intel Core i5-4440,Intel i7-4770,8,16,NVIDIA GTX 770,NVIDIA GTX 1060,2,4,23,23,17-09-2020
+Risk of Rain 2,Windows 7,Windows 10,Intel Core i3-6100,Intel i5-6600K,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,2,4,35,35,09-09-2019
+Deep Rock Galactic,Windows 7,Windows 10,Intel Core i5-2400,Intel i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,25,25,13-05-2018
+Noita,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,1,1,15-10-2019
+Katana Zero,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,1,1,18-04-2019
+Ori and the Will of the Wisps,Windows 10,Windows 11,Intel Core i5-2500,Intel i7-3770,8,16,NVIDIA GTX 950,NVIDIA GTX 1060,2,4,20,20,11-03-2020
+Hollow Knight,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,4,8,Intel HD 3000,NVIDIA GTX 650,1,2,2,2,24-02-2017
+Dead Cells,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,1,1,07-08-2018
+Enter the Gungeon,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,1,1,05-04-2016
+Slay the Spire,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,2,2,15-01-2019
+FTL: Faster Than Light,Windows Vista,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,1,1,14-09-2012
+Into the Breach,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,1,1,27-02-2018
+Kingdom: New Lands,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,2,4,Intel HD 3000,NVIDIA GTX 650,1,2,1,1,09-08-2016
+Absolver,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,15,15,29-07-2017
+For Honor,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-3770,8,16,NVIDIA GTX 660,NVIDIA GTX 1060,2,4,35,35,14-02-2017
+Warframe,Windows 7,Windows 10,Intel Core 2 Duo E8400,Intel i5-3570,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,50,50,25-03-2013
+Path of Exile,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,4,8,Intel HD 3000,NVIDIA GTX 650,1,2,20,20,23-10-2013
+Albion Online,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,25,25,17-07-2017
+New World,Windows 10,Windows 11,Intel Core i5-2400,Intel i7-4770,8,16,NVIDIA GTX 670,NVIDIA GTX 1060,2,4,50,50,28-09-2021
+Lost Ark,Windows 10,Windows 11,Intel Core i5-6600,Intel i7-8700,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,50,50,11-02-2022
+Black Desert Online,Windows 7,Windows 10,Intel Core i5-3330,Intel i7-3770,4,8,NVIDIA GTX 650,NVIDIA GTX 960,1,2,45,45,03-12-2014
+Trove,Windows 7,Windows 10,Intel Core 2 Duo,Intel i3,4,8,Intel HD 3000,NVIDIA GTX 650,1,2,10,10,09-07-2015
+Dauntless,Windows 7,Windows 10,Intel Core i3-3210,Intel i5-4440,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,15,15,21-05-2019
+War Thunder,Windows 7,Windows 10,Intel Core 2 Duo E8400,Intel i5-3570,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,20,20,21-11-2012
+World of Tanks,Windows 7,Windows 10,Intel Core 2 Duo E8400,Intel i5-3570,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,50,50,12-08-2010
+World of Warships,Windows 7,Windows 10,Intel Core 2 Duo E8400,Intel i5-3570,4,8,Intel HD 4000,NVIDIA GTX 650,1,2,30,30,15-09-2015
+Destiny 2,Windows 7,Windows 10,Intel Core i5-2400,Intel i7-4770,8,16,NVIDIA GTX 660,NVIDIA GTX 1060,2,4,105,105,28-08-2017
+The Division 2,Windows 10,Windows 11,Intel Core i5-2500K,Intel i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,4,6,50,50,15-03-2019
+Anthem,Windows 10,Windows 11,Intel Core i5-3570K,Intel i7-4770,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,3,6,50,50,22-02-2019
+Outriders,Windows 10,Windows 11,Intel Core i5-3570K,Intel i7-4770,8,16,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,100,100,01-04-2021
+Rage 2,Windows 7,Windows 10,Intel Core i5-3570K,Intel i7-4770,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,2,4,50,50,14-05-2019
+Borderlands 3,Windows 7,Windows 10,Intel Core i5-3570K,Intel i7-4770,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,3,6,75,75,13-09-2019
+Tiny Tina's Wonderlands,Windows 10,Windows 11,Intel Core i5-3570K,Intel i7-8700,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,4,6,50,50,25-03-2022
+Remnant: From the Ashes,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-4770,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,4,6,50,50,20-08-2019
+Code Vein,Windows 7,Windows 10,Intel Core i5-2300,Intel i7-3770,8,16,NVIDIA GTX 650,NVIDIA GTX 1060,2,4,35,35,27-09-2019
+Nioh 2,Windows 10,Windows 11,Intel Core i5-6600,Intel i7-8700,8,16,NVIDIA GTX 780,NVIDIA GTX 1060,3,6,50,50,13-03-2020
+Sekiro: Shadows Die Twice,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-3770,8,16,NVIDIA GTX 760,NVIDIA GTX 1060,2,4,25,25,22-03-2019
+Dark Souls 3,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-3770,8,16,NVIDIA GTX 750,NVIDIA GTX 1060,2,4,25,25,12-04-2016
+Bloodborne,Windows 7,Windows 10,Intel Core i5-2500K,Intel i7-3770,8,16,NVIDIA GTX 750,NVIDIA GTX 1060,2,4,25,25,24-03-2015
+Demon's Souls,Windows 10,Windows 11,Intel Core i5-8400,Intel i7-8700K,16,32,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,30,30,12-11-2020
+Lies of P,Windows 10,Windows 11,Intel Core i5-8400,Intel i7-8700,16,32,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,40,40,19-09-2023
+Lords of the Fallen,Windows 10,Windows 11,Intel Core i5-6600,Intel i7-8700,12,16,NVIDIA GTX 1060,NVIDIA RTX 2060,4,8,45,45,13-10-2023
+Steelrising,Windows 10,Windows 11,Intel Core i5-6600,Intel i7-8700,8,16,NVIDIA GTX 960,NVIDIA GTX 1060,2,4,25,25,08-09-2022
+Prototype 1,Windows 7,Windows 10,Intel Core 2 Duo,Intel Core i3,2,4,NVIDIA GeForce 7800,NVIDIA GeForce GTX 460,1,2,8,8,10-06-2009
+Prototype 2,Windows 7,Windows 10,Intel Core 2 Duo,Intel Core i3,2,4,NVIDIA GeForce 8800,NVIDIA GeForce GTX 460,1,2,10,10,24-07-2012

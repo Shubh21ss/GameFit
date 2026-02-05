@@ -1,0 +1,13 @@
+{
+  "platforms": [
+    "PC",
+    "iOS",
+    "macOS",
+    "Linux"
+  ],
+  "stores": [
+    "Steam",
+    "App Store",
+    "Google Play"
+  ]
+}

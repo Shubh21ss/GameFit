@@ -1,0 +1,15 @@
+{
+  "platforms": [
+    "PC",
+    "PlayStation 5",
+    "Xbox One",
+    "PlayStation 4",
+    "Xbox Series S/X"
+  ],
+  "stores": [
+    "Steam",
+    "PlayStation Store",
+    "GOG",
+    "Epic Games"
+  ]
+}
