@@ -250,7 +250,7 @@ See `FINAL_YEAR_PROJECT_GUIDE.md` for detailed information about:
 - **Project**: GameFit - Game Compatibility Checker
 - **Purpose**: Final Year Project
 - **Version**: 1.0
-- **Author**: Your Name
+- **Author**: Shubham Sushil Gavand
 - **License**: MIT
 
 ## 📞 Support
