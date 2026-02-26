@@ -95,6 +95,40 @@ All guides are in the **`docs/`** folder:
 
 **AAA:** Cyberpunk 2077, Red Dead Redemption 2, The Witcher 3, Elden Ring, Baldur's Gate 3, Dragon's Dogma 2, Starfield
 
+
+## ➕ ADDING MORE GAMES
+
+You can expand the catalogue without rebuilding the application:
+
+1. **Edit the CSV seed file** (`docs/seed/custom_games.csv`) and restart the
+   server (or delete `data/gamefit.db` so `migrate_csv_to_database()` runs
+   again).  This is handy for bulk imports.
+
+2. **Use the new API endpoint** to add a single title programmatically:
+
+   ```http
+   POST /api/add-game
+   Content-Type: application/json
+
+   {
+     "name": "Your Game Name",
+     "os_min": "Windows 10",
+     "cpu_min": "Intel i5-8400",
+     "ram_min": "8",
+     "gpu_min": "GTX 1050",
+     "vram_min": "2",
+     "storage_min": "50"
+   }
+   ```
+
+   The server will insert the record and clear the in-memory cache so the
+   game becomes visible immediately when you scan.
+
+
+## 🎯 GAMES (14 Total)
+
+**AAA:** Cyberpunk 2077, Red Dead Redemption 2, The Witcher 3, Elden Ring, Baldur's Gate 3, Dragon's Dogma 2, Starfield
+
 **Indie:** Stardew Valley, Minecraft
 
 **Online:** Counter-Strike 2, Fortnite, Final Fantasy XIV

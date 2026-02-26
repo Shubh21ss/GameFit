@@ -40,7 +40,7 @@
       <section id="games" class="section hidden">
         <h2>Compatible Games</h2>
         <div class="search-filter">
-          <input type="text" id="search-input" placeholder="Search games by name...">
+          <input type="text" id="search-input" placeholder="Search games by name... (includes non‑compatible)">
           <select id="ram-filter">
             <option value="">All RAM</option>
             <option value="4">Min RAM: 4GB+</option>
@@ -70,6 +70,7 @@
         <div id="modal-content">
           <img id="modal-image" src="" alt="Game Image" />
           <h2 id="modal-title"></h2>
+          <div id="modal-compatibility-badge" class="compatibility-badge"></div>
           <div class="requirements">
             <h3>System Requirements</h3>
             <div class="req-section">
@@ -145,6 +146,13 @@
             game.image = details.image;
             game.platforms = details.platforms;
             game.stores = details.stores;
+            // compatibility fields may come from this call
+            if (details.compatibility_percent !== undefined) {
+              game.compatibility_percent = details.compatibility_percent;
+            }
+            if (details.compatibility_color) {
+              game.compatibility_color = details.compatibility_color;
+            }
             addLogMessage(`Details loaded for ${game.name}`);
           } catch (e) {
             addLogMessage(`Failed to load details for ${game.name}`);
@@ -154,6 +162,12 @@
 
         document.getElementById('modal-image').src = game.image || '/static/placeholder.svg';
         document.getElementById('modal-title').textContent = game.name;
+        // compatibility badge inside modal
+        const badge = document.getElementById('modal-compatibility-badge');
+        if (badge) {
+          badge.textContent = `${game.compatibility_percent || ''}% compatible`;
+          badge.style.backgroundColor = game.compatibility_color || badge.style.backgroundColor;
+        }
         document.getElementById('modal-os-min').textContent = `OS: ${game.os_min}`;
         document.getElementById('modal-cpu-min').textContent = `CPU: ${game.cpu_min}`;
         document.getElementById('modal-ram-min').textContent = `RAM: ${game.ram_min}`;
@@ -199,7 +213,12 @@
         games.forEach(g => {
           const card = document.createElement('div');
           card.className = 'game-card';
+          // border color based on compatibility
+          if (g.compatibility_color) {
+            card.style.border = `2px solid ${g.compatibility_color}`;
+          }
           card.innerHTML = `\
+            <div class="compatibility-badge" style="background-color: ${g.compatibility_color || 'hsl(0,80%,45%)'}">${g.compatibility_percent || 0}%</div>\
             <img src="${g.image || '/static/placeholder.svg'}" alt="${g.name}" />\
             <h3>${g.name}</h3>\
             <p>Min RAM: ${g.ram_min}  Min VRAM: ${g.gpu_min || g.vram_min || 'N/A'}</p>`;
@@ -214,19 +233,42 @@
       const ramFilter = document.getElementById('ram-filter');
       const vramFilter = document.getElementById('vram-filter');
 
-      function filterGames() {
-        const searchTerm = searchInput.value.toLowerCase();
+      async function filterGames() {
+        const searchTerm = searchInput.value.trim();
         const ramMin = parseFloat(ramFilter.value) || 0;
         const vramMin = parseFloat(vramFilter.value) || 0;
-        const filtered = gameData.filter(g => {
-          const matchesSearch = g.name.toLowerCase().includes(searchTerm);
-          const matchesRam = parseFloat(g.ram_min) >= ramMin;
-          const matchesVram = parseFloat(g.vram_min || 0) >= vramMin;
-          return matchesSearch && matchesRam && matchesVram;
-        });
-        displayGames(filtered);
-        // Hide see-all button when filtering
-        document.getElementById('see-all-btn-container').classList.add('hidden');
+        const heading = document.querySelector('#games h2');
+
+        if (searchTerm.length > 0) {
+          heading.textContent = 'Search Results';
+          // ask the server for matching entries (may include incompatible titles)
+          try {
+            const res = await fetch(`/api/games?search=${encodeURIComponent(searchTerm)}`);
+            const data = await res.json();
+            let filtered = data.games || [];
+            // apply additional RAM/VRAM filters on the results
+            filtered = filtered.filter(g => {
+              const okRam = parseFloat(g.ram_min || 0) >= ramMin;
+              const okVram = parseFloat(g.vram_min || 0) >= vramMin;
+              return okRam && okVram;
+            });
+            displayGames(filtered);
+            document.getElementById('see-all-btn-container').classList.add('hidden');
+            return;
+          } catch (e) {
+            console.error('Search request failed', e);
+          }
+        } else {
+          heading.textContent = 'Compatible Games';
+        }
+
+        // no search term, just show compatible games
+        if (!showingAllGames) {
+          displayGames(compatibleGames.slice(0, 4));
+        } else {
+          displayGames(compatibleGames);
+        }
+        document.getElementById('see-all-btn-container').classList.remove('hidden');
       }
 
       searchInput.addEventListener('input', filterGames);
@@ -297,22 +339,31 @@
           addLogMessage('Checking game compatibility...');
 
           gamesGrid.innerHTML = '';
-          gameData = data.compatible_games; // Store the data
-          console.log('Compatible games found:', data.compatible_games.length);
-          if (data.compatible_games.length === 0) {
+          compatibleGames = data.games; // store full set for later
+          console.log('Compatible games found:', compatibleGames.length);
+          if (compatibleGames.length === 0) {
             gamesGrid.innerHTML = '<p>No compatible games found.</p>';
             addLogMessage('No compatible games found.');
           } else {
-            addLogMessage(`Found ${data.compatible_games.length} compatible games.`);
-            // Show only first 4 games initially
-            displayGames(data.compatible_games.slice(0, 4));
+            addLogMessage(`Found ${compatibleGames.length} compatible games.`);
+            // pick a preview that shows range rather than just top entries
+            if (compatibleGames.length > 4) {
+              // keep two highest and two lowest percentages if there is variation
+              const sorted = compatibleGames.slice().sort((a,b)=>a.compatibility_percent-b.compatibility_percent);
+              const lowest = sorted.slice(0,2);
+              const highest = sorted.slice(-2);
+              gameData = highest.concat(lowest);
+            } else {
+              gameData = compatibleGames.slice();
+            }
+            displayGames(gameData);
           }
           gamesSection.classList.remove('hidden');
           addLogMessage('Scan completed successfully.');
           
           // Show the "Show All Games" button after a brief delay to ensure everything is rendered
-          if (data.compatible_games.length > 4) {
-            console.log('Will show see all button after delay, games found:', data.compatible_games.length);
+          if (compatibleGames.length > 4) {
+            console.log('Will show see all button after delay, games found:', compatibleGames.length);
             setTimeout(() => {
               console.log('Showing see all button now');
               const btnContainer = document.getElementById('see-all-btn-container');
@@ -337,6 +388,7 @@
       // See All Compatible Games button functionality
       const seeAllBtn = document.getElementById('see-all-btn');
       let showingAllGames = false;
+      let compatibleGames = []; // store full results from initial scan
 
       console.log('See all button element:', seeAllBtn);
 
@@ -345,14 +397,14 @@
         
         if (!showingAllGames) {
           // Show all games
-          displayGames(gameData);
+          displayGames(compatibleGames);
           // Change button text
           seeAllBtn.textContent = 'Show Less Games';
           showingAllGames = true;
-          addLogMessage(`All ${gameData.length} compatible games displayed.`);
+          addLogMessage(`All ${compatibleGames.length} compatible games displayed.`);
         } else {
           // Show only first 4 games
-          displayGames(gameData.slice(0, 4));
+          displayGames(compatibleGames.slice(0, 4));
           // Change button text back
           seeAllBtn.textContent = 'Show All Games';
           showingAllGames = false;

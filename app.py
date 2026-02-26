@@ -15,6 +15,7 @@ import logging
 import webbrowser
 import time
 import shutil
+import threading
 
 
 # Set up logging
@@ -169,6 +170,42 @@ def get_all_games():
         logger.error(f"Error fetching games: {e}")
         return []
 
+
+def add_game_to_db(game_data):
+    """Insert a new game record and invalidate the cache."""
+    global GAMES_CACHE
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR IGNORE INTO games (name, os_min, os_rec, cpu_min, cpu_rec,
+                                      ram_min, ram_rec, gpu_min, gpu_rec,
+                                      vram_min, vram_rec, storage_min, storage_rec, release_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            game_data.get('name',''),
+            game_data.get('os_min',''),
+            game_data.get('os_rec',''),
+            game_data.get('cpu_min',''),
+            game_data.get('cpu_rec',''),
+            game_data.get('ram_min',''),
+            game_data.get('ram_rec',''),
+            game_data.get('gpu_min',''),
+            game_data.get('gpu_rec',''),
+            game_data.get('vram_min',''),
+            game_data.get('vram_rec',''),
+            game_data.get('storage_min',''),
+            game_data.get('storage_rec',''),
+            game_data.get('release_date','')
+        ))
+        conn.commit()
+        GAMES_CACHE = []  # invalidate cache
+        logger.info(f"Added new game to DB: {game_data.get('name')}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to add game: {e}")
+        return False
+
 def format_cpu_info(raw_cpu_string):
     """
     Format raw CPU string into user-friendly format
@@ -278,7 +315,6 @@ def get_system_info():
         gpu_name = "Integrated Graphics"
         gpu_vram = 2  # Fallback
 
-    import os
     if platform.system() == 'Windows':
         drive = os.getcwd().split(os.sep)[0] + os.sep
     else:
@@ -321,30 +357,73 @@ def parse_size(value):
     except:
         return 0
 
+def compute_compatibility(game, system_info):
+    """Return a compatibility percentage (0-100) and a colour string (hsl) based on system vs game requirements.
+
+    Only RAM, VRAM and storage are compared numerically; other fields are ignored.
+    If a requirement is missing or zero it is treated as satisfied.
+    """
+    try:
+        ram_req = parse_size(game.get("ram_min", 0))
+        vram_req = parse_size(game.get("vram_min", 0))
+        storage_req = parse_size(game.get("storage_min", 0))
+
+        sys_ram = system_info.get("RAM (GB)", 0)
+        sys_vram = system_info.get("VRAM (GB)", 0)
+        sys_storage = system_info.get("Storage (GB)", 0)
+
+        # if there are no explicit requirements at all we treat the game as not
+        # applicable rather than fully compatible.  this handles placeholder
+        # search results and any weird empty rows.
+        if ram_req <= 0 and vram_req <= 0 and storage_req <= 0:
+            return 0, "hsl(0,80%,45%)"
+
+        comps = []
+        for req, sys in ((ram_req, sys_ram), (vram_req, sys_vram), (storage_req, sys_storage)):
+            if req > 0:
+                comps.append(min(sys / req, 1))
+            else:
+                comps.append(1)
+
+        if comps:
+            percent = int((sum(comps) / len(comps)) * 100)
+        else:
+            percent = 0
+
+        # hue 0 = red, 120 = green; scale linearly
+        hue = percent * 1.2
+        color = f"hsl({hue:.0f}, 80%, 45%)"
+        return percent, color
+    except Exception as e:
+        logger.debug(f"Compatibility computation failed: {e}")
+        return 0, "hsl(0,80%,45%)"
+
+
 def get_compatible_games(system_info):
-    """Get compatible games using cached data (no DB queries for in-database games)"""
-    logger.debug("Filtering compatible games from cache")
-    compatible_games = []
-    
-    # Use cached games instead of querying DB
-    all_games = get_all_games()
-    
-    for game in all_games:
+    """Return every game with a non-zero compatibility score.
+
+    Previously this helper filtered out anything that didn't meet all of the
+    minimum requirements, which meant the UI only ever saw 100% entries.  For
+    the new grading display we want to show the full range (10–100%).
+    """
+    logger.debug("Computing compatibility for all games")
+    eligible = []
+
+    for game in get_all_games():
         try:
-            ram_min = parse_size(game["ram_min"])
-            vram_min = parse_size(game["vram_min"])
-            storage_min = parse_size(game["storage_min"])
-
-            sys_ram = system_info["RAM (GB)"]
-            sys_vram = system_info["VRAM (GB)"]
-            sys_storage = system_info["Storage (GB)"]
-
-            if sys_ram >= ram_min and sys_vram >= vram_min and sys_storage >= storage_min:
-                compatible_games.append(game)
+            percent, color = compute_compatibility(game, system_info)
+            if percent > 0:
+                # don't mutate original cache inadvertently
+                g = game.copy()
+                g["compatibility_percent"] = percent
+                g["compatibility_color"] = color
+                eligible.append(g)
         except Exception as e:
-            logger.debug(f"Skipping game due to error: {e}")
-    
-    return compatible_games
+            logger.debug(f"Skipping game during compatibility calc: {e}")
+
+    # sort highest compatibility first so front end can slice(0,4) safely
+    eligible.sort(key=lambda x: x.get("compatibility_percent", 0), reverse=True)
+    return eligible
 
 def fetch_game_details(game_name):
     try:
@@ -467,49 +546,94 @@ def system_specs():
 
 @app.route("/api/games")
 def compatible_games():
-    """Get compatible games with 5-minute browser cache"""
+    """Return games relevant to the current system.
+
+    Without a query parameter this endpoint behaves exactly as before: it
+    returns only games that meet the minimum RAM/VRAM/storage
+    requirements.  When the `search` parameter is supplied the database is
+    searched by name (case‑insensitive wildcard) and _all_ matching games are
+    returned regardless of whether the machine actually fulfils the
+    requirements; this allows the front end to offer a global search over the
+    catalogue.  If a game is not present in the DB we still return a single
+    entry with data from RAWG but compatibility will always be treated as
+    0%.
+    """
     logger.info("API /api/games called")
     specs = get_system_info()
-    games = get_compatible_games(specs)
+
+    search_term = request.args.get("search", "").strip()
+    games_list = []
+
+    if search_term:
+        logger.info(f"Searching for games matching '{search_term}'")
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # case‑insensitive search
+        cursor.execute("SELECT * FROM games WHERE name LIKE ? COLLATE NOCASE", (f"%{search_term}%",))
+        rows = cursor.fetchall()
+        if rows:
+            games_list = [dict(r) for r in rows]
+        else:
+            # not in database; fall back to rawg for image/platforms but we can't
+            # compute requirements so compatibility is 0
+            logger.debug("No database entry found; returning placeholder entry")
+            games_list = [{
+                "name": search_term,
+                "os_min": "",
+                "os_rec": "",
+                "cpu_min": "",
+                "cpu_rec": "",
+                "ram_min": "",
+                "ram_rec": "",
+                "gpu_min": "",
+                "gpu_rec": "",
+                "vram_min": "",
+                "vram_rec": "",
+                "storage_min": "",
+                "storage_rec": "",
+            }]
+    else:
+        # normal compatibility check
+        games_list = get_compatible_games(specs)
 
     result = []
-    for g in games:
+    for g in games_list:
         image_path = os.path.join("static", "images", f"{g['name']}.jpg")
         image_url = f"/{image_path}" if os.path.exists(image_path) else ""
-        
-        # If no local image, try to fetch from API
         if not image_url:
             api_details = fetch_game_details(g['name'])
             image_url = api_details.get('image', '')
-        
-        # Use pre-loaded details from memory if available
         if g['name'] in GAMES_CACHE_DETAILS:
             cached_details = GAMES_CACHE_DETAILS[g['name']]
         else:
             cached_details = load_cached_game_details(g["name"])
 
+        percent, color = compute_compatibility(g, specs)
+
         result.append({
             "name": g["name"],
-            "image": image_url,  # Serve local image if available, else API image
+            "image": image_url,
             "platforms": cached_details.get("platforms", []),
             "stores": cached_details.get("stores", []),
-            "os_min": g["os_min"],
+            "os_min": g.get("os_min", ""),
             "os_rec": g.get("os_rec", ""),
-            "cpu_min": g["cpu_min"],
-            "cpu_rec": g["cpu_rec"],
-            "ram_min": g["ram_min"],
-            "ram_rec": g["ram_rec"],
-            "gpu_min": g["gpu_min"],
-            "gpu_rec": g["gpu_rec"],
+            "cpu_min": g.get("cpu_min", ""),
+            "cpu_rec": g.get("cpu_rec", ""),
+            "ram_min": g.get("ram_min", ""),
+            "ram_rec": g.get("ram_rec", ""),
+            "gpu_min": g.get("gpu_min", ""),
+            "gpu_rec": g.get("gpu_rec", ""),
             "vram_min": g.get("vram_min", ""),
             "vram_rec": g.get("vram_rec", ""),
-            "storage_min": g["storage_min"],
-            "storage_rec": g["storage_rec"],
+            "storage_min": g.get("storage_min", ""),
+            "storage_rec": g.get("storage_rec", ""),
+            "compatibility_percent": percent,
+            "compatibility_color": color,
         })
 
     response = jsonify({
         "system_info": specs,
-        "compatible_games": result
+        "games": result
     })
     # Browser cache for 5 minutes (300 seconds)
     response.headers["Cache-Control"] = "public, max-age=300"
@@ -517,12 +641,50 @@ def compatible_games():
 
 @app.route("/api/game/<game_name>")
 def game_details(game_name):
-    """Fetch details for a specific game on-demand (API mode for online searches)"""
-    details = fetch_game_details(game_name.replace('_', ' '))
+    """Fetch details for a specific game on-demand (API mode for online searches).
+
+    This endpoint also returns compatibility percentage and colour so the
+    modal can show a grade even when the card was populated via a search.
+    """
+    name = game_name.replace('_', ' ')
+    details = fetch_game_details(name)
+
+    # attempt to retrieve requirements from DB to compute compatibility
+    specs = get_system_info()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM games WHERE name = ? COLLATE NOCASE", (name,))
+    row = cursor.fetchone()
+    if row:
+        game_req = dict(row)
+        percent, color = compute_compatibility(game_req, specs)
+    else:
+        percent, color = 0, "hsl(0,80%,45%)"
+
+    details["compatibility_percent"] = percent
+    details["compatibility_color"] = color
+
     response = jsonify(details)
     # Cache for 1 hour for online searches
     response.headers["Cache-Control"] = "public, max-age=3600"
     return response
+
+
+@app.route('/api/add-game', methods=['POST'])
+def api_add_game():
+    """Receive JSON payload and add a new game to the database.
+
+    Expects at least a `name` field.  Optional fields mirror the CSV columns
+    (os_min, cpu_min, ram_min, gpu_min, vram_min, storage_min, etc.).
+    """
+    payload = request.get_json(force=True)
+    if not payload or 'name' not in payload:
+        return jsonify({'success': False, 'error': 'name is required'}), 400
+
+    success = add_game_to_db(payload)
+    if success:
+        return jsonify({'success': True}), 201
+    return jsonify({'success': False, 'error': 'insert failed'}), 500
 
 # Call the database initialization and download function when the app starts
 if __name__ == "__main__":
@@ -533,8 +695,10 @@ if __name__ == "__main__":
     # Migrate data from CSV if needed
     migrate_csv_to_database()
     
-    # Download game images and details
-    download_game_images()
+    # Download game images and details in background to avoid blocking startup
+    download_thread = threading.Thread(target=download_game_images)
+    download_thread.daemon = True
+    download_thread.start()
     logger.info("GameFit server starting on http://127.0.0.1:5000")
     print("GameFit server starting on http://127.0.0.1:5000")
     print("Opening browser automatically...")
