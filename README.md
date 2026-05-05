@@ -318,3 +318,4 @@ MIT License - Feel free to use and distribute
 3. **Build**: Run `build_exe.bat`
 
 Enjoy! 🚀
+......
